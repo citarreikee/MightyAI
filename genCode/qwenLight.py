@@ -1,5 +1,5 @@
-from config import HOME_ASSISTANT_TOKEN
-from yeelinkLamp22Cad9Light import YeelinkLamp22Cad9Light
+from deviceHA.config import HOME_ASSISTANT_TOKEN
+from deviceHA.yeelinkLamp22Cad9Light import YeelinkLamp22Cad9Light
 import datetime
 import time
 

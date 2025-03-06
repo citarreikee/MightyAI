@@ -1,5 +1,5 @@
-from config import HOME_ASSISTANT_TOKEN
-from yeelinkLamp22Cad9Light import YeelinkLamp22Cad9Light
+from deviceHA.config import HOME_ASSISTANT_TOKEN
+from deviceHA.yeelinkLamp22Cad9Light import YeelinkLamp22Cad9Light
 
 import keyboard
 
@@ -16,8 +16,9 @@ import keyboard
 #         direction *= -1  # 改变方向
 #     i += 50 * direction
 
-# Add hotkey for Ctrl+J+K and call the check_hotkey function
+# # Add hotkey for Ctrl+J+K and call the check_hotkey function
 
+# lamp = YeelinkLamp22Cad9Light(HOME_ASSISTANT_TOKEN)
 # keyboard.add_hotkey('j',lamp.toggle)
 # keyboard.wait('esc')
 
@@ -72,13 +73,15 @@ class SOSSignalSender:
 
 def main():
     lamp = YeelinkLamp22Cad9Light(HOME_ASSISTANT_TOKEN)
+    
+    print("准备发送SOS信号...")
     sender = SOSSignalSender(lamp)
 
-    print("准备发送SOS信号...")
+    
     print("按 'q' 键停止发送。")
 
     # 使用键盘监听来停止发送
-    keyboard.add_hotkey('q', lda: sender.stop())
+    keyboard.add_hotkey('q', sender.stop)
 
     try:
         sender.send_sos_signal()

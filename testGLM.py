@@ -1,6 +1,6 @@
 import time
 import json
-from devices import lamp
+from deviceHA.devices import lamp
 from zhipuai import ZhipuAI
 
 # lamp.set_light_brightness(100)
