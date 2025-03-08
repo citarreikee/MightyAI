@@ -1,4 +1,4 @@
 import ollama
-# ollama.delete('mollysama/rwkv-6-world:7b')
+ollama.delete('qwq:latest')
 i = ollama.list()
 print(i)
