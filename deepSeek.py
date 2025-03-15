@@ -1,7 +1,7 @@
 from ollama import AsyncClient
 
 async def chat():
-    client = AsyncClient()
+    client = AsyncClient(host='http://localhost:11434/')
     model = "deepseek-r1:32b"  # Replace with your desired model
     print("Starting chat with DeepSeek-R1. Type 'exit' to quit.")
     
@@ -21,6 +21,7 @@ async def chat():
 
         # Send user message and receive the assistant's response
         print("Assistant:")
+
         async for part in await client.chat(model=model, messages=conversation_history, stream=True):
             if 'message' in part:
                 print(f"{part['message']['content']}", end='', flush=True)
@@ -28,6 +29,9 @@ async def chat():
         # Add the assistant's message to the conversation history
         if 'message' in part:
            conversation_history.append({'role': 'assistant', 'content': part['message']['content']})
+
+        # async for part in await client.chat(model=model, messages=conversation_history, stream=True):
+        #     print(part)
     
     # Unload the model from memory
     await client.chat(model=model, messages=[], keep_alive=0)

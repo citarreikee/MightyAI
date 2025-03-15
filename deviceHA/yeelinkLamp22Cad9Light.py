@@ -10,8 +10,8 @@ import requests
 # 小米参数 https://home.miot-spec.com/
 class YeelinkLamp22Cad9Light:
     def __init__(self, token):
-        self.set_miot_property_url = "http://127.0.0.1:8123/api/services/xiaomi_miot/set_miot_property"
-        self.call_action_url = "http://127.0.0.1:8123/api/services/xiaomi_miot/call_action"
+        self.set_miot_property_url = "http://192.168.0.35:8123/api/services/xiaomi_miot/set_miot_property"
+        self.call_action_url = "http://192.168.0.35:8123/api/services/xiaomi_miot/call_action"
         self.headers = {
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {token}'
@@ -45,8 +45,14 @@ class YeelinkLamp22Cad9Light:
             "aiid": 1,
         })
         response = requests.request("POST", self.call_action_url, headers=self.headers, data=payload)
-        return "命令已发送"
+        return response
     
+# Successful calls will return status code 200 or 201. Other status codes that can return are:
+
+# 400 (Bad Request)
+# 401 (Unauthorized)
+# 404 (Not Found)
+# 405 (Method Not Allowed)
 
 
 

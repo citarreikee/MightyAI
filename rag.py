@@ -7,7 +7,7 @@ class knowledgeBase:
             content = f.read()
         
         self.docs = self.split_content(content)
-        self.embeds = self.encode(self.docs)
+        # self.embeds = self.encode(self.docs)
 
     @staticmethod
     def split_content(content, max_length = 256):
@@ -105,6 +105,7 @@ if __name__ == "__main__":
 
 
     ap = knowledgeBase('api.md')
+    print(len(ap.docs))
     # t1 = ap.search('Generate Embeddings')
     # t2 = ap.find_most_similar_matrix('Generate Embeddings')
 
