@@ -1,4 +1,4 @@
-from ollama import chat,Message
+from ollama import chat,Message,Client
 
 messages = [
         Message(role='user',content='''You have access to the following tools:
@@ -64,7 +64,9 @@ You must always select one of the above tools and respond with only a JSON objec
 input: turn off the light.''')
 ]
 
-response = chat(model='mollysama/rwkv-6-world:14b', messages=messages,)
+client = Client(host='http://127.0.0.1:11434/')
+# response = client.chat(model='mollysama/rwkv-6-world:14b', messages=messages,)
+response = client.chat(model='deepseek-r1:32b', messages=messages)
 
 print(response)
 

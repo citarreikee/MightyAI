@@ -7,7 +7,7 @@ class knowledgeBase:
             content = f.read()
         
         self.docs = self.split_content(content)
-        # self.embeds = self.encode(self.docs)
+        self.embeds = self.encode(self.docs)
 
     @staticmethod
     def split_content(content, max_length = 256):
@@ -96,12 +96,12 @@ class RAG:
         
     
 if __name__ == "__main__":
-    # rag = RAG('deepseek-r1:32b',knowledgeBase(''))
+    rag = RAG('deepseek-r1:32b',knowledgeBase(''))
 
-    # while True:
-    #     q = input('Human:')
-    #     r = rag.chat(q)
-    #     print('Assistant:',r['content'])
+    while True:
+        q = input('Human:')
+        r = rag.chat(q)
+        print('Assistant:',r['content'])
 
 
     ap = knowledgeBase('api.md')
