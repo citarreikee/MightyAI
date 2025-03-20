@@ -178,76 +178,76 @@ class MengliLamp001:
 #     except KeyboardInterrupt:
 #         print("程序终止")
 
-# import asyncio
-# from math import pi, sin
+import asyncio
+from math import pi, sin
 
-# class LightShow:
-#     def __init__(self, lamp):
-#         self.lamp = lamp
+class LightShow:
+    def __init__(self, lamp):
+        self.lamp = lamp
         
-#     async def breathe_effect(self, duration=10, cycles=3):
-#         """呼吸灯效果：亮度正弦波动，色温同步渐变"""
-#         for _ in range(cycles):
-#             for i in range(101):
-#                 # 使用正弦曲线生成更自然的呼吸效果
-#                 brightness = 50 * (1 + sin(2 * pi * i / 100))  # 0~100范围波动
-#                 temp = 2000 + int(4000 * i / 100)  # 色温从2000K到6000K
+    async def breathe_effect(self, duration=10, cycles=3):
+        """呼吸灯效果：亮度正弦波动，色温同步渐变"""
+        for _ in range(cycles):
+            for i in range(101):
+                # 使用正弦曲线生成更自然的呼吸效果
+                brightness = 50 * (1 + sin(2 * pi * i / 100))  # 0~100范围波动
+                temp = 2000 + int(4000 * i / 100)  # 色温从2000K到6000K
                 
-#                 # 同时设置所有灯光
-#                 await self.lamp.set_all_light_brightness(brightness, brightness, brightness)
-#                 print(f"亮度设定为：{brightness}")
-#                 await self.lamp.set_all_light_color_temp(temp, temp, temp)
-#                 print(f"色温设定为：{temp}")
-#                 await asyncio.sleep(duration/100)
-#                 print(f"休眠：{duration/100}")
+                # 同时设置所有灯光
+                await self.lamp.set_all_light_brightness(brightness, brightness, brightness)
+                print(f"亮度设定为：{brightness}")
+                await self.lamp.set_all_light_color_temp(temp, temp, temp)
+                print(f"色温设定为：{temp}")
+                await asyncio.sleep(duration/100)
+                print(f"休眠：{duration/100}")
                 
-#             for i in reversed(range(101)):
-#                 brightness = 50 * (1 + sin(2 * pi * i / 100))
-#                 temp = 6000 - int(4000 * i / 100)
+            for i in reversed(range(101)):
+                brightness = 50 * (1 + sin(2 * pi * i / 100))
+                temp = 6000 - int(4000 * i / 100)
                 
-#                 await self.lamp.set_all_light_brightness(brightness, brightness, brightness)
-#                 print(f"亮度设定为：{brightness}")
-#                 await self.lamp.set_all_light_color_temp(temp, temp, temp)
-#                 print(f"色温设定为：{temp}")
-#                 await asyncio.sleep(duration/100)
-#                 print(f"休眠：{duration/100}")
+                await self.lamp.set_all_light_brightness(brightness, brightness, brightness)
+                print(f"亮度设定为：{brightness}")
+                await self.lamp.set_all_light_color_temp(temp, temp, temp)
+                print(f"色温设定为：{temp}")
+                await asyncio.sleep(duration/100)
+                print(f"休眠：{duration/100}")
 
-#     async def sunrise_wakeup(self, duration=300):
-#         """模拟日出效果：亮度从0到100%，色温从暖黄到自然白"""
-#         steps = int(duration)
-#         for i in range(steps):
-#             progress = i / steps
-#             brightness = 100 * progress
-#             temp = 2000 + int(4000 * progress)
+    async def sunrise_wakeup(self, duration=300):
+        """模拟日出效果：亮度从0到100%，色温从暖黄到自然白"""
+        steps = int(duration)
+        for i in range(steps):
+            progress = i / steps
+            brightness = 100 * progress
+            temp = 2000 + int(4000 * progress)
             
-#             await self.lamp.set_all_light_brightness(brightness, brightness, brightness)
-#             print(f"亮度设定为：{brightness}")
-#             await self.lamp.set_all_light_color_temp(temp, temp, temp)
-#             print(f"色温设定为：{temp}")
-#             await asyncio.sleep(0.1)
+            await self.lamp.set_all_light_brightness(brightness, brightness, brightness)
+            print(f"亮度设定为：{brightness}")
+            await self.lamp.set_all_light_color_temp(temp, temp, temp)
+            print(f"色温设定为：{temp}")
+            await asyncio.sleep(0.1)
 
-# async def main():
-#     # 设备信息需要替换为实际值
-#     LAMP_ADDRESS = "20:43:A8:6B:1D:2E"
-#     UUID_W = "12a59e0a-17cc-11ec-9621-0242ac130002"
-#     UUID_R = "12a5a148-17cc-11ec-9621-0242ac130002"
+async def main():
+    # 设备信息需要替换为实际值
+    LAMP_ADDRESS = "20:43:A8:6B:1D:2E"
+    UUID_W = "12a59e0a-17cc-11ec-9621-0242ac130002"
+    UUID_R = "12a5a148-17cc-11ec-9621-0242ac130002"
 
-#     lamp = MengliLamp001(LAMP_ADDRESS, UUID_W, UUID_R)
-#     show = LightShow(lamp)
+    lamp = MengliLamp001(LAMP_ADDRESS, UUID_W, UUID_R)
+    show = LightShow(lamp)
 
-#     try:
-#         print("启动呼吸灯效果...")
-#         await show.breathe_effect(duration=8, cycles=2)
+    try:
+        print("启动呼吸灯效果...")
+        await show.breathe_effect(duration=8, cycles=2)
         
-#         print("启动日出唤醒效果...")
-#         await show.sunrise_wakeup(duration=20)
+        print("启动日出唤醒效果...")
+        await show.sunrise_wakeup(duration=20)
         
-#     except Exception as e:
-#         print(f"发生错误: {str(e)}")
-#     finally:
-#         # 重置为默认状态
-#         await lamp.set_all_light_brightness(50, 50, 50)
-#         await lamp.set_normal_mode()
+    except Exception as e:
+        print(f"发生错误: {str(e)}")
+    finally:
+        # 重置为默认状态
+        await lamp.set_all_light_brightness(50, 50, 50)
+        await lamp.set_normal_mode()
 
-# if __name__ == "__main__":
-#     asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())

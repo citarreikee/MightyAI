@@ -114,7 +114,7 @@ async def chat():
         print("Assistant:")
         response = client.chat(model=model, messages=conversation_history, tools=tools)
         # print(response['message']['content'])
-        print(response, type(response))
+        print(response['message']['content'])
         # Add the assistant's message to the conversation history
         # conversation_history.append({'role': 'assistant', 'content': part['message']['content']})
         conversation_history.append(response['message'])
