@@ -315,36 +315,25 @@ class MengliFunctionCall:
         except Exception as e:
             return f"执行错误：{str(e)}"
 
-# 使用示例
-async def main():
-    function_caller = MengliFunctionCall(lamp)
-
-    # 大模型返回的示例（模拟LLM输出）
-    llm_response = {
-        "tool_calls": [{
-            "function": {
-                "name": "set_all_light_brightness",
-                "arguments": '{"up": 0, "middle": 0, "night": 0}'
-            }
-        }]
-    }
-
-    for tool_call in llm_response.get("tool_calls", []):
-        result = await function_caller.parse_function_call(tool_call["function"])
-        print(result)
-
-async def chat():
-    client = Client(host='http://192.168.0.102:11434/')
+def chat(conversation_history, tools):
     model = "qwq"  # Replace with your desired model
-    print("Starting chat with Mighty AI. Type 'exit' to quit.")
+    client = Client(host='http://192.168.0.102:11434/')
+    llm_response = client.chat(model=model, messages=conversation_history, tools=tools)
+
+    return llm_response
+
+async def main():
     
+    
+    print("Starting chat with Mighty AI. Type 'exit' to quit.")
     # Initialize the conversation history
     conversation_history = []
     conversation_history.append({"role": "system", "content": "你是智能显示器灯控制管家，根据用户的需求和你的专业能力调用相关的控制函数控制灯。"})
     
+    
     function_caller = MengliFunctionCall(lamp)
     tools=function_caller.available_functions
-    print(tools) 
+    
 
     while True:
         user_input = input("You: ")
@@ -356,7 +345,7 @@ async def chat():
 
         # Send user message and receive the assistant's response
         print("Assistant:")
-        llm_response = client.chat(model=model, messages=conversation_history, tools=tools)
+        llm_response = chat(conversation_history, tools)
         # print(response['message']['content'])
         print(llm_response)
 
@@ -364,9 +353,8 @@ async def chat():
             result = await function_caller.parse_function_call(tool_call["function"])
             print(result)
         # Add the assistant's message to the conversation history
-        # conversation_history.append({'role': 'assistant', 'content': part['message']['content']})
         conversation_history.append(llm_response['message'])
         
 
 if __name__ == "__main__":
-    asyncio.run(chat())
+    asyncio.run(main())

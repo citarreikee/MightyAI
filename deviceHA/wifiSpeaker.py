@@ -1,7 +1,7 @@
 import json
 import logging
 import uuid
-from config import HOME_ASSISTANT_TOKEN
+
 
 import requests
 
@@ -29,5 +29,3 @@ class WifiSpaekerlx06:
         response = requests.request("POST", self.call_action_url, headers=self.headers, data=payload)
         return response
     
-speaker = WifiSpaekerlx06(HOME_ASSISTANT_TOKEN)
-speaker.play_text("你好！我是你的智能显示器灯控制管家，可以帮你调节亮度、色温或开关灯。有什么需要我为你调整的吗？")
