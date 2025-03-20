@@ -279,13 +279,34 @@ class MengliFunctionCall:
                 if param.name in function_args:
                     # 类型强制转换
                     arg_value = function_args[param.name]
-                    expected_type = param.annotation
-                    if expected_type != param.empty:
-                        kwargs[param.name] = expected_type(arg_value)
+
+                    # 特殊处理方向参数
+                    if param.name == "direction":
+                        if arg_value in ("0", "1"):
+                            kwargs[param.name] = int(arg_value)  # 字符串转整数
+                        else:
+                            raise ValueError("方向参数必须是'0'或'1'的字符串")
                     else:
-                        kwargs[param.name] = arg_value
+                        # 通用类型转换
+                        if param.annotation != param.empty:
+                            kwargs[param.name] = param.annotation(arg_value)
+                        else:
+                            kwargs[param.name] = arg_value
+
+                    # expected_type = param.annotation
+                    # if expected_type != param.empty:
+                    #     kwargs[param.name] = expected_type(arg_value)
+                    # else:
+                    #     kwargs[param.name] = arg_value
         except (ValueError, TypeError) as e:
             return f"参数验证失败：{str(e)}"
+
+        # # 在执行方法前进行类型转换
+        # if param.annotation == int and isinstance(arg_value, str):
+        #     try:
+        #         kwargs[param.name] = int(arg_value)
+        #     except ValueError:
+        #         raise ValueError(f"参数 {param.name} 需要整数类型")
 
         # 执行异步方法
         try:
