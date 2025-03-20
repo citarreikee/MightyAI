@@ -3,10 +3,17 @@ import json
 import asyncio
 from typing import List, Dict, Any
 
-from deviceHA.devices import lamp
+from deviceHA.devices import lamp, speaker
+
 
 from ollama import Client
 from ollama import chat, Message
+
+import wave
+import pyaudio
+import whisper
+
+import re
 
 class MengliFunctionCall:
     def __init__(self, lamp_instance):
@@ -315,6 +322,50 @@ class MengliFunctionCall:
         except Exception as e:
             return f"执行错误：{str(e)}"
 
+async def record_audio(model: whisper.Whisper, seconds: int = 5) -> str:
+    """异步录音并转换为文本"""
+    loop = asyncio.get_event_loop()
+    
+    def sync_record():
+        CHUNK = 1024
+        FORMAT = pyaudio.paInt16
+        CHANNELS = 1
+        RATE = 16000
+        
+        p = pyaudio.PyAudio()
+        stream = p.open(format=FORMAT,
+                        channels=CHANNELS,
+                        rate=RATE,
+                        input=True,
+                        frames_per_buffer=CHUNK)
+        
+        print("\n录音中...（正在聆听）")
+        frames = []
+        for _ in range(0, int(RATE / CHUNK * seconds)):
+            data = stream.read(CHUNK)
+            frames.append(data)
+        
+        stream.stop_stream()
+        stream.close()
+        p.terminate()
+        
+        with wave.open("temp.wav", "wb") as wf:
+            wf.setnchannels(CHANNELS)
+            wf.setsampwidth(p.get_sample_size(FORMAT))
+            wf.setframerate(RATE)
+            wf.writeframes(b''.join(frames))
+        return "temp.wav"
+
+    try:
+        # 异步执行录音
+        audio_file = await loop.run_in_executor(None, sync_record)
+        # 异步执行语音识别
+        result = await loop.run_in_executor(None, model.transcribe, audio_file)
+        return result["text"].strip()
+    except Exception as e:
+        print(f"语音识别错误: {str(e)}")
+        return ""
+
 def chat(conversation_history, tools):
     model = "qwq"  # Replace with your desired model
     client = Client(host='http://192.168.0.102:11434/')
@@ -326,34 +377,59 @@ async def main():
     
     
     print("Starting chat with Mighty AI. Type 'exit' to quit.")
-    # Initialize the conversation history
-    conversation_history = []
-    conversation_history.append({"role": "system", "content": "你是智能显示器灯控制管家，根据用户的需求和你的专业能力调用相关的控制函数控制灯。"})
+    # 初始化语音模型
+    print("正在加载语音识别模型...")
+    whisper_model = whisper.load_model("small")
+    print("模型加载完成\n")
     
+    # 初始化对话历史
+    conversation_history = [
+        {"role": "system", "content": "你是智能显示器灯控制管家，根据用户的需求和你的专业能力调用相关的控制函数控制灯。"}
+    ]
     
     function_caller = MengliFunctionCall(lamp)
-    tools=function_caller.available_functions
+    tools = function_caller.get_tools_spec()
+
+    print("语音控制已就绪，请说指令（说'退出'结束）")
     
-
     while True:
-        user_input = input("You: ")
-        if user_input.lower() == 'exit':
+        # 语音输入
+        user_input = await record_audio(whisper_model, seconds=5)
+        
+        # 处理退出指令
+        if not user_input:
+            continue
+        if "退出" in user_input.lower():
             break
+            
+        print(f"\n用户输入: {user_input}")
+        
+        # 添加到对话历史
+        conversation_history.append({"role": "user", "content": user_input})
+        
+        # 获取LLM响应
+        try:
+            llm_response = chat(conversation_history, tools)
+            content = llm_response['message']['content']
+            cleaned_content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()
+            print(f"助手响应: {cleaned_content}")
+            # speaker.play_text(cleaned_content)
 
-        # Add the user's message to the conversation history
-        conversation_history.append({'role': 'user', 'content': user_input})
+            conversation_history.append(llm_response['message'])
+            
+            # 处理函数调用
+            for tool_call in llm_response['message'].get("tool_calls", []):
+                result = await function_caller.parse_function_call(tool_call["function"])
+                print(f"设备反馈: {result}")
 
-        # Send user message and receive the assistant's response
-        print("Assistant:")
-        llm_response = chat(conversation_history, tools)
-        # print(response['message']['content'])
-        print(llm_response)
+                conversation_history.append({"role": "tool","content": str(result),"tool_call_id":tool_call})
+            llm_response = chat(conversation_history, tools)
+            
 
-        for tool_call in llm_response['message'].get("tool_calls", []):
-            result = await function_caller.parse_function_call(tool_call["function"])
-            print(result)
-        # Add the assistant's message to the conversation history
-        conversation_history.append(llm_response['message'])
+                      
+            
+        except Exception as e:
+            print(f"处理错误: {str(e)}")
         
 
 if __name__ == "__main__":
