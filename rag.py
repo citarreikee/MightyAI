@@ -96,7 +96,7 @@ class RAG:
         
     
 if __name__ == "__main__":
-    rag = RAG('deepseek-r1:32b',knowledgeBase(''))
+    rag = RAG('deepseek-r1:32b',knowledgeBase('api.md'))
 
     while True:
         q = input('Human:')

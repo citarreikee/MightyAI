@@ -47,4 +47,3 @@ except KeyboardInterrupt:
     stream.stop_stream()
     stream.close()
     audio.terminate()
-    

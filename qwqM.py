@@ -417,16 +417,21 @@ async def main():
 
             conversation_history.append(llm_response['message'])
             
-            # 处理函数调用
-            for tool_call in llm_response['message'].get("tool_calls", []):
-                result = await function_caller.parse_function_call(tool_call["function"])
-                print(f"设备反馈: {result}")
 
-                conversation_history.append({"role": "tool","content": str(result),"tool_call_id":tool_call})
-            llm_response = chat(conversation_history, tools)
+            if llm_response['message']['tool_calls']:
+                # 处理函数调用
+                for tool_call in llm_response['message'].get("tool_calls", []):
+                    result = await function_caller.parse_function_call(tool_call["function"])
+                    print(f"设备反馈: {result}")
+
+                    conversation_history.append({"role": "tool","content": str(result),"tool_call_id":tool_call})
+                
+                llm_response = chat(conversation_history, tools)
+                content = llm_response['message']['content']
+                cleaned_content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()
+                print(f"助手响应: {cleaned_content}")
             
-
-                      
+                    
             
         except Exception as e:
             print(f"处理错误: {str(e)}")
@@ -434,3 +439,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
